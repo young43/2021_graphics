@@ -105,7 +105,17 @@ void compose_imgui_frame()
     ImGui::Begin("control");
 
     // TODO
-    ImGui::SliderFloat("translate", &vec_translate[0], -3.0f, 3.0f);
+    //ImGui::SliderFloat("translate", &vec_translate[0], -3.0f, 3.0f);
+    //ImGui::SliderFloat("translate", &vec_translate[1], -3.0f, 3.0f);
+    ImGui::SliderFloat3("translate", (float*)&vec_translate, -3.0f, 3.0f);
+    ImGui::SliderFloat3("scale", (float*)&vec_scale, -3.0f, 3.0f);
+    
+
+    // or explicitly
+    static quat q(1.f, 0.f, 0.f, 0.f);
+    static vec3 pos(0.f);
+    ImGui::gizmo3D("##Dir1", pos, q, 100, imguiGizmo::mode3Axes|imguiGizmo::cubeAtOrigin);
+    mat_rot = mat4_cast(q);
 
     ImGui::End();
   }
@@ -150,12 +160,21 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     vec_translate[0] += 0.1f;
   
   // TODO
+  // move down
+  if (key == GLFW_KEY_J && action == GLFW_PRESS) 
+    vec_translate[1] -= 0.1f;
+  // mode up
+  if (key == GLFW_KEY_K && action == GLFW_PRESS)
+    vec_translate[1] += 0.1f;
 
   // scale
   if (key == GLFW_KEY_EQUAL && action == GLFW_PRESS)
     vec_scale += 0.1f;
   
   // TODO
+  // 축소
+  if (key == GLFW_KEY_MINUS && action == GLFW_PRESS)
+    vec_scale -= 0.1f;
 }
 
 
@@ -280,6 +299,7 @@ void set_transform()
   // TODO
   mat_model = mat_model * glm::scale(glm::mat4(1.0f), vec_scale);
   mat_model = mat_model * glm::translate(vec_translate);
+  mat_model = mat_model * mat_rot;
 }
 
 
