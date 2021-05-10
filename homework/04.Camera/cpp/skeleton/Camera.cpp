@@ -46,5 +46,5 @@ void Camera::move_down(float delta)
 
 void Camera::update_front_direction(glm::vec3 dir)
 {
-  front_dir_ = dir - position_;
+  front_dir_ = dir;
 }
