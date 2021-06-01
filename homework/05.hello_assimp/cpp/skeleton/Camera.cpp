@@ -8,43 +8,43 @@ const glm::vec3 Camera::center_position() const
 }
 
 // TODO: fill up the following functions properly 
-const glm::mat4  Camera::get_view_matrix()
+const glm::mat4 Camera::get_view_matrix()
 {
-
+  return glm::lookAt(position_, center_position(), up_dir_);
 }
 
 void Camera::move_forward(float delta)
 {
-
+  position_ += glm::normalize(front_dir_) * delta;
 }
 
 void Camera::move_backward(float delta)
 {
-
+  position_ -= glm::normalize(front_dir_) * delta;
 }
 
 void Camera::move_left(float delta)
 {
-
+  position_ -= glm::normalize(glm::cross(front_dir_, up_dir_)) * delta;
 }
 
 void Camera::move_right(float delta)
 {
-
+  position_ += glm::normalize(glm::cross(front_dir_, up_dir_)) * delta;;
 }
 
 void Camera::move_up(float delta)
 {
-
+  position_ += glm::normalize(up_dir_) * delta;
 }
 
 void Camera::move_down(float delta)
 {
-
+  position_ -= glm::normalize(up_dir_) * delta;
 }
 
 
 void Camera::update_front_direction(glm::vec3 dir)
 {
-
+  front_dir_ = dir;
 }

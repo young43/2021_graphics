@@ -77,6 +77,7 @@ const aiScene* scene;
 std::vector<Object> objects;
 std::vector<std::string> object_names;
 
+bool save_scene(const std::string& filename);
 bool load_asset(const std::string& filename);
 // void init_buffer_objects();     // VBO init 함수: GPU의 VBO를 초기화하는 함수.
 void render_object();           // rendering 함수: 물체(삼각형)를 렌더링하는 함수.
@@ -177,6 +178,38 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     cameras[cam_select_idx].move_forward(0.1f);
   if (key == GLFW_KEY_S && action == GLFW_PRESS)
     cameras[cam_select_idx].move_backward(0.1f);
+
+  
+  // scene file save
+  if (key && GLFW_KEY_F1 && action == GLFW_PRESS) save_scene("info.txt");
+}
+
+bool save_scene(const std::string& filename)
+{
+  std::ofstream output(filename.data());
+  if(!output.is_open())
+    return false;
+
+  output << object_names.size() << "\n";
+  for(int i=0; i<object_names.size(); i++){
+    output << object_names[i] << "\n";
+    output << (float)objects[i].scale()[0] << "\n";
+
+    for(int j=0; j<3; j++) output << (float)objects[i].translate()[j] << " ";
+    output << "\n";
+  }
+
+  output << cameras.size() << "\n";
+  for(int i=0; i<cameras.size(); i++){
+    for(int j=0; j<3; j++) output << (float)cameras[i].position()[j] << " ";
+    output << "\n";
+    for(int j=0; j<3; j++) output << (float)cameras[i].front_direction()[j] << " ";
+    output << "\n";
+    for(int j=0; j<3; j++) output << (float)cameras[i].up_direction()[j] << " ";
+    output << "\n";
+  }
+
+  output.close();
 }
 
 void init_window(GLFWwindow* window) 
@@ -327,6 +360,10 @@ void compose_imgui_frame()
     ImGui::RadioButton("camera 0", &cam_select_idx, 0);
     ImGui::RadioButton("camera 1", &cam_select_idx, 1);
     ImGui::Checkbox("perspective", &g_is_perspective);
+
+    if (g_is_perspective) cameras[cam_select_idx].set_mode(Camera::Mode::kPerspective);
+    else  cameras[cam_select_idx].set_mode(Camera::Mode::kOrtho);
+    
     
     ImGui::Text("view direction");
     vec3 dir = vec3(cameras[cam_select_idx].front_direction());
@@ -443,10 +480,21 @@ void render_object()
   // 특정 쉐이더 프로그램 사용
   glUseProgram(program);
 
-  
+  mat_view = cameras[cam_select_idx].get_view_matrix();
+
+  if(cameras[cam_select_idx].mode() == Camera::kPerspective) 
+    mat_proj = glm::perspective(glm::radians(cameras[cam_select_idx].fovy()), 1.0f,  0.1f, 100.0f);
+  else
+    mat_proj = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 0.1f, 100.0f);
+
   for (int i = 0; i < objects.size(); ++i)
   {
     // TODO : draw each object
+    mat_PVM = mat_proj * mat_view * objects[i].get_model_matrix();
+    glUniformMatrix4fv(loc_u_PVM, 1, GL_FALSE, glm::value_ptr(mat_PVM));
+
+    objects[i].draw(loc_a_position, loc_a_color);
+    //  objects[i].print_info();
   }
 
   // 쉐이더 프로그램 사용해제
@@ -472,7 +520,6 @@ void render(GLFWwindow* window)
   // Poll for and process events
   glfwPollEvents();
 }
-
 
 int main(int argc, char* argv[])
 {
