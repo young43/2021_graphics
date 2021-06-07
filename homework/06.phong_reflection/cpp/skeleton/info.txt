@@ -1,5 +1,5 @@
 2
-models/avocado_smooth.ply
+models/avocado.obj
 0.2
 -0.2 0.0 0.0
 models/bunny.ply
