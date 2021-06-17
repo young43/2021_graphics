@@ -490,6 +490,22 @@ void init_shader_program()
   loc_a_color = glGetAttribLocation(program, "a_color");
 
   // TODO : get locations
+  loc_a_normal = glGetAttribLocation(program, "a_normal");
+
+  loc_u_light_position = glGetUniformLocation(program, "u_light_position");
+  loc_u_light_ambient = glGetUniformLocation(program, "u_light_ambient");
+  loc_u_light_diffuse = glGetUniformLocation(program, "u_light_diffuse");
+  loc_u_light_specular = glGetUniformLocation(program, "u_light_specular");
+
+  loc_u_obj_ambient = glGetUniformLocation(program, "u_obj_ambient");
+  loc_u_obj_diffuse = glGetUniformLocation(program, "u_obj_diffuse");
+  loc_u_obj_specular = glGetUniformLocation(program, "u_obj_specular");
+  loc_u_obj_shininess = glGetUniformLocation(program, "u_obj_shininess");
+
+  loc_u_camera_position = glGetUniformLocation(program, "u_camera_position");
+  loc_u_view_matrix = glGetUniformLocation(program, "u_view_matrix");
+  loc_u_model_matrix = glGetUniformLocation(program, "u_model_matrix");
+  loc_u_normal_matrix = glGetUniformLocation(program, "u_normal_matrix");
 
 }
 
@@ -520,6 +536,15 @@ void render_object()
   {
     // TODO : set mat_model, mat_normal, mat_PVM 
     // TODO : send data to GPU
+
+    mat_model = models[i].get_model_matrix();
+    glUniformMatrix4fv(loc_u_model_matrix, 1, GL_FALSE, glm::value_ptr(mat_model));
+
+    glm::mat3 normalMat = glm::transpose(glm::inverse(glm::mat3(mat_model)));
+    glUniformMatrix3fv(loc_u_normal_matrix, 1, GL_FALSE, glm::value_ptr(normalMat));
+
+    mat_PVM = mat_proj * mat_view * mat_model;
+    glUniformMatrix4fv(loc_u_PVM, 1, GL_FALSE, glm::value_ptr(mat_PVM));
 
     models[i].draw(loc_a_position, loc_a_normal, loc_u_obj_ambient, loc_u_obj_diffuse, loc_u_obj_specular, loc_u_obj_shininess);
   }

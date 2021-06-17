@@ -18,6 +18,11 @@ void Model::draw(int loc_a_position, int loc_a_normal, int loc_u_ambient, int lo
     for (int i = 0; i < mMeshes.size(); ++i)
     {
         // TODO : send material data to GPU
+        // color
+        glUniform3fv(loc_u_ambient, 1, glm::value_ptr(mMeshes[i].mMaterial.ambient));
+        glUniform3fv(loc_u_diffuse, 1, glm::value_ptr(mMeshes[i].mMaterial.diffuse));
+        glUniform3fv(loc_u_specular, 1, glm::value_ptr(mMeshes[i].mMaterial.specular));
+        glUniform1f(loc_u_shininess, mMeshes[i].mMaterial.shininess);
 
         mMeshes[i].draw(loc_a_position, loc_a_normal);
     }

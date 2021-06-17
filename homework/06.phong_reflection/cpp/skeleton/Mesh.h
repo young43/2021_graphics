@@ -41,6 +41,10 @@ private:
     GLuint  position_buffer; // GPU 메모리에서 vertices_buffer 위치 
     GLuint  color_buffer;    // GPU 메모리에서 color_buffer 위치
     GLuint  normal_buffer;
+    GLuint  index_buffer;
+
+    std::vector<unsigned int> indices;
+
     bool    is_color = false;
 
     std::vector<Face> faces;
