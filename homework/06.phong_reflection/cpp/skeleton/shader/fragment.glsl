@@ -33,7 +33,7 @@ vec3 directional_light()
   vec3 reflect_dir = reflect(-light_dir, normal_wc); 
 
   float rdotv = max(dot(view_dir, reflect_dir), 0.0);
-  color += (pow(rdotv, u_obj_shininess) * u_light_specular * u_obj_specular);
+  color += (pow(rdotv, u_obj_shininess) * u_light_specular * u_obj_shininess);
 
   return color;
 }
